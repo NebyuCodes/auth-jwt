@@ -12,16 +12,13 @@ export default () => {
 
   const server = createServer(app);
 
-  // console.log(generateToken("1", "user"));
-  let token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJyb2xlIjoidXNlciIsImlhdCI6MTc0MDc2NTExMSwiZXhwIjoxNzQwNzY1MTcxfQ.X92R9YhMWii0tr_Mivg6PM7tB9o3jewI-29z9ArRIoQ";
-  console.log(verifyToken(token));
-
   server.listen(port, () => {
     console.log(`Listening on ${port}...`);
   });
 
-  // const mongo = db.mongo();
+  const mongo = db.mongo();
+
+  // console.log(app._router.stack[5].handle.stack);
 
   // Majestic close
   process.on("SIGINT", () => {

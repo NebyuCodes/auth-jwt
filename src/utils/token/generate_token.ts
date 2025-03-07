@@ -8,6 +8,6 @@ import config from "../../config";
  */
 export default (id: string, role: string) => {
   return sign({ id, role }, config.jwt.secret, {
-    expiresIn: 60,
+    expiresIn: "90d",
   });
 };

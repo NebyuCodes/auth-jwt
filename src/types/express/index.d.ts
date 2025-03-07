@@ -5,6 +5,7 @@ declare global {
     interface Request {
       admin: object;
       user: object;
+      value: object;
     }
   }
 }

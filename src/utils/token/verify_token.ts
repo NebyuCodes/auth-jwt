@@ -12,7 +12,7 @@ interface ICustomJwtPayload extends JwtPayload {
  * @returns {JwtPayload} Jwt payload
  */
 export default (token: string): ICustomJwtPayload => {
-  return verify(token, "12345") as ICustomJwtPayload;
+  return verify(token, config.jwt.secret) as ICustomJwtPayload;
 };
 
 // Payload

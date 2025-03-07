@@ -17,7 +17,6 @@ export default (
 
   // Handle Error
   err = errors(err);
-
   // Send Dev error
   if (configs.env === "local" || configs.env === "development") {
     sendDevError(err, res);

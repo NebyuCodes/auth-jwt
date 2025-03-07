@@ -26,7 +26,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // Use routes from V1
-// v1(app);
+v1(app);
 
 // Unknown URLs
 app.use("*", (req: Request, res: Response, next: NextFunction) => {
