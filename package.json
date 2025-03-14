@@ -16,7 +16,9 @@
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.11.0",
-    "otp-generator": "^4.0.1"
+    "otp-generator": "^4.0.1",
+    "ua-parser-js": "^2.0.2",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",

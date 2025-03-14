@@ -15,6 +15,7 @@ export interface IUserDocument extends Document {
   otpExpiresIn: Date;
   passwordResetToken: string;
   passwordResetTokenExpiresIn: string;
+  lastActivityDate: Date;
   createdAt: Date;
   updatedAt: Date;
 }

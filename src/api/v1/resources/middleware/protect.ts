@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import AppError from "../../../../utils/app_error";
 import { verifyToken } from "../../../../utils/token";
 import { UserDal } from "../user/dal";
+import { SessionsDal } from "../sessions/dal";
 
 export const protect: RequestHandler = async (req, res, next) => {
   try {
@@ -46,6 +47,28 @@ export const protect: RequestHandler = async (req, res, next) => {
             400
           )
         );
+
+      // Check the session
+      const session = await SessionsDal.getSessionByUserAndDeviceId(
+        user.id,
+        decyrptData.deviceId
+      );
+      if (!session) return next(new AppError("Session does not exists.", 404));
+
+      // Check session expire date
+      if (session.expireDate.getTime() < Date.now()) {
+        if (!session.isOwner) {
+          await SessionsDal.deleteSession(session.id);
+          return next(
+            new AppError("Session expired. Please login again.", 400)
+          );
+        } else {
+          await SessionsDal.updateSessionExpireDate(
+            session.id,
+            new Date(Date.now() + 20 * 60 * 1000)
+          );
+        }
+      }
 
       req.user = user;
     }

@@ -6,6 +6,9 @@ import { UserDal } from "./dal";
 import { compareSync } from "bcryptjs";
 import AppError from "../../../../utils/app_error";
 import { generateToken } from "../../../../utils/token";
+import { SessionsDal } from "../sessions/dal";
+import { deviceInfo } from "../../../../utils/deviceInfo";
+import { deviceIdGenerator } from "../../../../utils/deviceIdGenerator";
 
 // Create user
 export const createUser: RequestHandler = async (req, res, next) => {
@@ -103,7 +106,35 @@ export const userLogin: RequestHandler = async (req, res, next) => {
       await UserDal.updateIsPasswordChanged(user.id, false);
     }
 
-    const token = generateToken(user.id, "user");
+    const userSessions = await SessionsDal.getUserSessions(user.id);
+    if (userSessions.length >= 3)
+      return next(
+        new AppError(
+          "Maximum number of sessions for this user has reached.",
+          400
+        )
+      );
+
+    let isOwner = false;
+    if (userSessions.length === 0) {
+      isOwner = true;
+    }
+
+    let userAgent = "Unknown";
+    if (req.headers["user-agent"]) {
+      userAgent = req.headers["user-agent"];
+    }
+
+    let deviceId = deviceIdGenerator(user.id);
+    const session = await SessionsDal.createSession({
+      userId: user.id,
+      deviceId,
+      deviceInfo: deviceInfo(userAgent),
+      expireDate: new Date(Date.now() + 20 * 60 * 1000),
+      isOwner,
+    });
+
+    const token = generateToken(user.id, "user", deviceId);
 
     res.status(200).json({
       status: "SUCCESS",
@@ -111,6 +142,7 @@ export const userLogin: RequestHandler = async (req, res, next) => {
         user,
       },
       token,
+      session,
     });
   } catch (error) {
     next(error);

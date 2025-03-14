@@ -6,8 +6,8 @@ import config from "../../config";
  * @param {string} id
  * @returns {string} token
  */
-export default (id: string, role: string) => {
-  return sign({ id, role }, config.jwt.secret, {
+export default (id: string, role: string, deviceId?: string) => {
+  return sign({ id, role, deviceId }, config.jwt.secret, {
     expiresIn: "90d",
   });
 };
