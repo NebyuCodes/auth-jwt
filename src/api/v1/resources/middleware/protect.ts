@@ -1,8 +1,13 @@
 import { RequestHandler } from "express";
 import AppError from "../../../../utils/app_error";
-import { verifyToken } from "../../../../utils/token";
+import {
+  decodeToken,
+  generateToken,
+  verifyToken,
+} from "../../../../utils/token";
 import { UserDal } from "../user/dal";
 import { SessionsDal } from "../sessions/dal";
+import { UserTokenDal } from "../userToken/dal";
 
 export const protect: RequestHandler = async (req, res, next) => {
   try {
@@ -17,11 +22,16 @@ export const protect: RequestHandler = async (req, res, next) => {
 
     if (!token) return next(new AppError("Please login.", 400));
 
-    const decyrptData = verifyToken(token);
+    const decodeAccessToken = verifyToken(token, false);
 
-    if (decyrptData.role === "user") {
-      const user = await UserDal.getUser(decyrptData.id);
+    if (decodeAccessToken.role === "user") {
+      const user = await UserDal.getUser(decodeAccessToken.id);
       if (!user) return next(new AppError("User does not exists.", 404));
+
+      const userToken = await UserTokenDal.getUserToken(user.id);
+      if (!userToken) return next(new AppError("Please login.", 400));
+
+      verifyToken(userToken.refreshToken, true);
 
       if (!user.isActive)
         return next(new AppError("User account is not active.", 400));
@@ -49,26 +59,26 @@ export const protect: RequestHandler = async (req, res, next) => {
         );
 
       // Check the session
-      const session = await SessionsDal.getSessionByUserAndDeviceId(
-        user.id,
-        decyrptData.deviceId
-      );
-      if (!session) return next(new AppError("Session does not exists.", 404));
+      // const session = await SessionsDal.getSessionByUserAndDeviceId(
+      //   user.id,
+      //   decyrptData.deviceId
+      // );
+      // if (!session) return next(new AppError("Session does not exists.", 404));
 
-      // Check session expire date
-      if (session.expireDate.getTime() < Date.now()) {
-        if (!session.isOwner) {
-          await SessionsDal.deleteSession(session.id);
-          return next(
-            new AppError("Session expired. Please login again.", 400)
-          );
-        } else {
-          await SessionsDal.updateSessionExpireDate(
-            session.id,
-            new Date(Date.now() + 20 * 60 * 1000)
-          );
-        }
-      }
+      // // Check session expire date
+      // if (session.expireDate.getTime() < Date.now()) {
+      //   if (!session.isOwner) {
+      //     await SessionsDal.deleteSession(session.id);
+      //     return next(
+      //       new AppError("Session expired. Please login again.", 400)
+      //     );
+      //   } else {
+      //     await SessionsDal.updateSessionExpireDate(
+      //       session.id,
+      //       new Date(Date.now() + 20 * 60 * 1000)
+      //     );
+      //   }
+      // }
 
       req.user = user;
     }

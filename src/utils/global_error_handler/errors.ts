@@ -12,11 +12,11 @@ export default (err: AppError): AppError => {
   }
 
   if (err.name === "JsonWebTokenError") {
-    return new AppError("Invalid token", 400);
+    return new AppError("Invalid token", 401);
   }
 
   if (err.name === "TokenExpiredError") {
-    return new AppError("Token expired", 400);
+    return new AppError("Token expired", 401);
   }
 
   if (err.name === "CastError") {

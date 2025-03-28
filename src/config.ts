@@ -20,7 +20,11 @@ export default {
   api_key: <string>process.env.API_KEY,
   delete_key: <string>process.env.DELETE_KEY,
   jwt: {
-    expiresin: <string>process.env.JWT_EXPIRESIN,
-    secret: <string>process.env.JWT_SECRET,
+    access: {
+      secret: <string>process.env.JWT_ACCESS_SECRET,
+    },
+    refresh: {
+      secret: <string>process.env.JWT_REFRESH_SECRET,
+    },
   },
 };

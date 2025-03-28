@@ -1,9 +1,11 @@
-import { JwtPayload, verify } from "jsonwebtoken";
+import { decode, JwtPayload, verify } from "jsonwebtoken";
 import config from "../../config";
 
 interface ICustomJwtPayload extends JwtPayload {
   id: string;
   role: string;
+  exp: number;
+  iat: number;
 }
 
 /**
@@ -11,12 +13,8 @@ interface ICustomJwtPayload extends JwtPayload {
  * @param {string} token
  * @returns {JwtPayload} Jwt payload
  */
-export default (token: string, isRefresh: boolean): ICustomJwtPayload => {
-  let secret = config.jwt.access.secret;
-  if (isRefresh) {
-    secret = config.jwt.refresh.secret;
-  }
-  return verify(token, secret) as ICustomJwtPayload;
+export default (token: string): ICustomJwtPayload => {
+  return decode(token) as ICustomJwtPayload;
 };
 
 // Payload

@@ -1,5 +1,5 @@
 import { Application } from "express";
-import { user, sessions } from "../../api/v1/resources";
+import { user, sessions, userToken } from "../../api/v1/resources";
 
 /**
  * Route based on the version of the API
@@ -9,4 +9,5 @@ import { user, sessions } from "../../api/v1/resources";
 export default (app: Application) => {
   app.use("/api/v1/user", user);
   app.use("/api/v1/sessions", sessions);
+  app.use("/api/v1/usertoken", userToken);
 };
